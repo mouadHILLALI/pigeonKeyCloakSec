@@ -7,13 +7,32 @@ services:
       - "8080:8080"
     depends_on:
       - db
+      - keycloak
     environment:
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
     networks:
       - app-network
-
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0.3
+    container_name: keycloak
+    command: start-dev
+    ports:
+      - "8082:8080"
+    environment:
+        KEYCLOAK_ADMIN: admin
+        KEYCLOAK_ADMIN_PASSWORD: admin123
+        KC_DB: postgres
+        KC_DB_URL: ${SPRING_DATASOURCE_URL}
+        KC_DB_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+        KC_DB_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+    depends_on:
+      - db
+    networks:
+      - app-network
   db:
     image: postgres:latest
     container_name: postgres-db
@@ -57,4 +76,5 @@ networks:
 volumes:
   pgdata:
   pgadmin-data:
+  keycloak_data:
   jenkins_home:
