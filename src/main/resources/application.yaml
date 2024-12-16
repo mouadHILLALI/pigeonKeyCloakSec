@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: PigeonSkyRace
+  profiles:
+    active: dev
+server:
+  port: 8082
+
+logging:
+  level:
+    root: DEBUG
+    org.springframework.jdbc: DEBUG
+
