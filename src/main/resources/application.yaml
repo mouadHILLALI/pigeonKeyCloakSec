@@ -3,9 +3,6 @@ spring:
     name: PigeonSkyRace
   profiles:
     active: dev
-server:
-  port: 8082
-
 logging:
   level:
     root: DEBUG
