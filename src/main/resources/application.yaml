@@ -3,8 +3,38 @@ spring:
     name: PigeonSkyRace
   profiles:
     active: dev
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: spring-boot-client
+            client-secret: ${SPRING_SECRET}
+            authorization-grant-type: authorization_code
+            scope: openid,profile,email
+            redirect-uri:  http://localhost:8082/login/oauth2/code/keycloak
+        provider:
+          keycloak:
+            token-uri: http://localhost:8082/realms/spring-boot-realm/protocol/openid-connect/token
+            authorization-uri: http://localhost:8082/realms/spring-boot-realm/protocol/openid-connect/auth
+
 logging:
   level:
     root: DEBUG
     org.springframework.jdbc: DEBUG
 
+keycloak:
+  auth-server-url:  http://localhost:8082/realms/spring-boot-realm
+  realm: spring-boot-realm
+  resource : spring-boot-client
+  credentials:
+    secret: ${SPRING_SECRET}
+  public-client: false
+  bearer-only: false 
+  use-resource-role-mappings: true
+
+  security-constraints:
+    - authRoles:
+        - USER
+        - ADMIN
+      urlPattern: /* 
