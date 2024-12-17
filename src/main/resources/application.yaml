@@ -1,3 +1,11 @@
+server:
+    port: 8443
+    ssl:
+      enabled: true
+      key-store: classpath:mykeystore.p12
+      key-store-password: pass123
+      key-store-type: PKCS12
+      key-alias: mykey
 spring:
   application:
     name: PigeonSkyRace
@@ -12,19 +20,18 @@ spring:
             client-secret: ${SPRING_SECRET}
             authorization-grant-type: authorization_code
             scope: openid,profile,email
-            redirect-uri:  http://localhost:8082/login/oauth2/code/keycloak
+            redirect-uri:  https://localhost:8443/login/oauth2/code/keycloak
         provider:
           keycloak:
-            token-uri: http://localhost:8082/realms/spring-boot-realm/protocol/openid-connect/token
-            authorization-uri: http://localhost:8082/realms/spring-boot-realm/protocol/openid-connect/auth
-
+            token-uri: https://localhost:8443/realms/spring-boot-realm/protocol/openid-connect/token
+            authorization-uri: https://localhost:8443/realms/spring-boot-realm/protocol/openid-connect/auth
 logging:
   level:
     root: DEBUG
     org.springframework.jdbc: DEBUG
 
 keycloak:
-  auth-server-url:  http://localhost:8082/realms/spring-boot-realm
+  auth-server-url:  https://localhost:8443/realms/spring-boot-realm
   realm: spring-boot-realm
   resource : spring-boot-client
   credentials:
