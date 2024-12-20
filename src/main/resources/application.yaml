@@ -1,11 +1,12 @@
 server:
-    port: 8443
-    ssl:
-      enabled: true
-      key-store: classpath:keystore.p12
-      key-store-password: pass123
-      key-store-type: PKCS12
-      key-alias: mykey
+  port: 8443
+  ssl:
+    enabled: true
+    key-store: classpath:keystore.p12
+    key-store-password: pass123
+    key-store-type: PKCS12
+    key-alias: mykey
+
 spring:
   application:
     name: PigeonSkyRace
@@ -13,35 +14,22 @@ spring:
     active: dev
   security:
     oauth2:
-      client:
-        registration:
-          keycloak:
-            client-id: spring-boot-client
-            client-secret: ${SPRING_SECRET}
-            authorization-grant-type: authorization_code
-            scope: openid,profile,email
-            redirect-uri:  https://localhost:8443/login/oauth2/code/keycloak
-        provider:
-          keycloak:
-            token-uri: https://localhost:8443/realms/spring-boot-realm/protocol/openid-connect/token
-            authorization-uri: https://localhost:8443/realms/spring-boot-realm/protocol/openid-connect/auth
+      resourceserver:
+        jwt:
+          issuer-uri: https://localhost:8444/realms/spring-boot-realm
+          jwk-set-uri: https://localhost:8444/realms/spring-boot-realm/protocol/openid-connect/certs
+          authorities-claim-name: realm_access.roles
+          authority-prefix: ROLE_
+
+keycloak:
+  client-id: spring-boot-client
+  client-secret: tyM3FZIyphgFpY6OYYRPYrD63WZD6P6d
+  grant-type: password
+  scope: openid
+  authorization-grant-type: authorization_code
+  redirect-uri: https://localhost:8443/login/oauth2/code/keycloak
+
 logging:
   level:
     root: DEBUG
     org.springframework.jdbc: DEBUG
-
-keycloak:
-  auth-server-url:  https://localhost:8443/realms/spring-boot-realm
-  realm: spring-boot-realm
-  resource : spring-boot-client
-  credentials:
-    secret: ${SPRING_SECRET}
-  public-client: false
-  bearer-only: false 
-  use-resource-role-mappings: true
-
-  security-constraints:
-    - authRoles:
-        - USER
-        - ADMIN
-      urlPattern: /* 
