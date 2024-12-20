@@ -1,40 +1,34 @@
 server:
-    port: 8443
-    ssl:
-      enabled: true
-      key-store: classpath:keystore.p12
-      key-store-password: pass123
-      key-store-type: PKCS12
-      key-alias: mykey
+  port: 8443
+  ssl:
+    enabled: true
+    key-store: classpath:keystore.p12
+    key-store-password: pass123
+    key-store-type: PKCS12
+    key-alias: mykey
+
 spring:
   application:
     name: PigeonSkyRace
   profiles:
     active: dev
-   security:
+  security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: https://localhost:8444/realms/spring-boot-realm
+          jwk-set-uri: https://localhost:8444/realms/spring-boot-realm/protocol/openid-connect/certs
+          authorities-claim-name: realm_access.roles
+          authority-prefix: ROLE_
+
+keycloak:
+  client-id: spring-boot-client
+  client-secret: ${SPRING_SECRET}
+  scope: openid
+  authorization-grant-type: authorization_code
+  redirect-uri: https://localhost:8443/login/oauth2/code/keycloak
+
 logging:
   level:
     root: DEBUG
     org.springframework.jdbc: DEBUG
-
-keycloak:
-  auth-server-url:  https://localhost:8444/realms/spring-boot-realm
-  realm: spring-boot-realm
-  resource : spring-boot-client
-  credentials:
-    secret: ${SPRING_SECRET}
-  public-client: false
-  bearer-only: false 
-  use-resource-role-mappings: true
-
-  security-constraints:
-    - authRoles:
-        - USER
-      urlPattern: /api/users/** 
-    - authRoles:
-        - ADMIN
-      urlPattern: /api/admin/**
