@@ -1,62 +1,75 @@
 pipeline {
-    agent any
+    agent any 
+
     tools {
-        maven 'maven 3.9.9'
-        jdk 'java 21'
+        dockerTool 'docker-latest'
+        maven 'maven'
+        jdk 'jdk_21'
     }
     environment {
-        DOCKER_IMAGE = 'pigeonrace-security-web-1'
-        DOCKER_CREDENTIALS = 'totogang'
+        DOCKER_IMAGE = 'pigeonrace-security-web'
     }
     stages {
         stage('Checkout') {
             steps {
-                echo "Cloning repository..."
-                checkout([$class: 'GitSCM',
-                    branches: [[name: '*/master']],
-                    userRemoteConfigs: [[url: 'https://github.com/mouadHILLALI/pigeonKeyCloakSec']]
-                ])
-            }
-        }
-        stage('Build') {
-            steps {
-                echo "Building the application..."
-                sh 'mvn clean package'
-            }
-        }
-        stage('Test') {
-            steps {
-                echo "Running tests..."
-                sh 'mvn test'
-            }
-        }
-        stage('Verify Docker') {
-            steps {
-                echo "Checking Docker version..."
-                sh 'docker --version'
-            }
-        }
-        stage('Deliver') {
-            steps {
-                echo "Building Docker image..."
-                sh '''
-                    docker build -t $DOCKER_IMAGE .
-                '''
-                echo "Pushing Docker image to Docker Hub..."
-                withDockerRegistry([credentialsId: DOCKER_CREDENTIALS, url: "https://index.docker.io/v1/"]) {
-                    sh '''
-                        docker push $DOCKER_IMAGE
-                    '''
+                script {
+                    echo "DEBUG: Starting Checkout stage..."
+                    deleteDir()
+                }
+                script {
+                    echo "DEBUG: Fetching the repository from Git..."
+                    git branch: 'master', url: 'https://github.com/mouadHILLALI/pigeonKeyCloakSec'
+                }
+                script {
+                    echo "DEBUG: Checkout stage completed successfully!"
                 }
             }
         }
+
+        stage('Build') {
+            steps {
+                script {
+                    def javaHome = '/opt/java/openjdk'
+                    
+                    withEnv(["JAVA_HOME=${javaHome}", "PATH+JAVA=${javaHome}/bin"]) {
+                        sh '''
+                            echo "JAVA_HOME is: $JAVA_HOME"
+                            echo "Checking JAVA_HOME contents:"
+                            ls -la $JAVA_HOME
+                            echo "Java version:"
+                            java -version
+                            echo "Maven version:"
+                            mvn -version
+                        '''
+                        
+                        echo "DEBUG: Starting Build stage..."
+                        sh 'mvn clean package -DskipTests'
+                        echo "DEBUG: Build stage completed successfully!"
+                    }
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                script {
+                    def javaHome = '/opt/java/openjdk'
+                    withEnv(["JAVA_HOME=${javaHome}", "PATH+JAVA=${javaHome}/bin"]) {
+                        echo 'DEBUG: Running tests...'
+                        sh 'mvn test'
+                    }
+                }
+            }
+        }
+            
     }
+
     post {
-        success {
-            echo 'Pipeline completed successfully!'
+        always {
+            echo 'DEBUG: Pipeline completed successfully'
         }
         failure {
-            echo 'Pipeline failed!'
+            echo 'DEBUG: Pipeline failed'
         }
     }
 }
