@@ -23,7 +23,8 @@ spring:
 
 keycloak:
   client-id: spring-boot-client
-  client-secret: ${SPRING_SECRET}
+  client-secret: tyM3FZIyphgFpY6OYYRPYrD63WZD6P6d
+  grant-type: password
   scope: openid
   authorization-grant-type: authorization_code
   redirect-uri: https://localhost:8443/login/oauth2/code/keycloak

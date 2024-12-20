@@ -37,8 +37,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .requestMatchers("/api/public/**").permitAll() 
-                    .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                    .requestMatchers("/api/users/**").hasRole("USER")
+                    .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
+                    .requestMatchers("/api/users/**").hasAuthority("ROLE_USER")
                     .anyRequest().authenticated())
                 .oauth2ResourceServer( (ouauth2) -> ouauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
             return http.build();
