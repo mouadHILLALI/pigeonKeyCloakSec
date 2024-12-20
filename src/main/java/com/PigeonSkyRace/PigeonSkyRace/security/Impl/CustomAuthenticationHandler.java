@@ -21,8 +21,10 @@ public class CustomAuthenticationHandler extends SimpleUrlAuthenticationSuccessH
 
         if (role.equals("ADMIN")) {
             setDefaultTargetUrl("/api/admin/manage");
-        }else{
+        }else if(role.equals("USER")){
             setDefaultTargetUrl("/api/users/message");
+        }else{
+            setDefaultTargetUrl("/api/public/register");
         }
         super.onAuthenticationSuccess(request, response, authentication);
     }

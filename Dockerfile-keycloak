@@ -1,0 +1,8 @@
+FROM quay.io/keycloak/keycloak:22.0.3
+
+COPY src/main/resources/keystore.p12 /opt/keycloak/conf/keystore.p12
+
+ENV KC_HTTPS_CERTIFICATE_FILE=/opt/keycloak/conf/keystore.p12
+ENV KC_HTTPS_CERTIFICATE_PASSWORD=pass123
+
+ENTRYPOINT ["/opt/keycloak/bin/kc.sh", "start-dev", "--https-key-store-file=/opt/keycloak/conf/keystore.p12", "--https-key-store-password=pass123"]

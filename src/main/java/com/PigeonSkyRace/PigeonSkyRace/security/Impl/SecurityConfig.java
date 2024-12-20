@@ -7,6 +7,7 @@ import java.util.Arrays;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -21,27 +22,21 @@ public class SecurityConfig {
 
     
         @Bean
-        public SecurityFilterChain configure(HttpSecurity http, CustomAuthenticationHandler successHandler) throws Exception {
+        public SecurityFilterChain configure(HttpSecurity http) throws Exception {
             http.cors(cors -> cors.configurationSource(corsFilter()))
-                .requiresChannel(channel -> channel.anyRequest().requiresSecure())
+            .csrf(customizer -> customizer.disable())
                 .authorizeHttpRequests(authorize -> authorize
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                    .requestMatchers("/api/public/**").permitAll()
+                    .requestMatchers("/api/public/**").permitAll() 
                     .requestMatchers("/api/admin/**").hasRole("ADMIN")
                     .requestMatchers("/api/users/**").hasRole("USER")
                     .anyRequest().authenticated())
-                .oauth2Login(login -> login
-                    .loginPage("/oauth2/authorization/keycloak")
-                    .successHandler(successHandler))
-                .logout(logout -> logout
-                    .logoutSuccessUrl("http://localhost:8082/realms/spring-boot-realm/oauth2/openid-connect/logout?post_logout_redirect_uri=https://localhost")
-                    .invalidateHttpSession(true)
-                    .clearAuthentication(true));
+                .oauth2ResourceServer( (ouauth2) -> ouauth2.jwt(Customizer.withDefaults()));
             return http.build();
         }
-    
+        
 
-   @Bean
+   @Bean        
    public CorsConfigurationSource corsFilter(){
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("https://localhost:8443"));
