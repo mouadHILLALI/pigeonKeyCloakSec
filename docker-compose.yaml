@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   web:
     build:
@@ -14,6 +16,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
     networks:
       - app-network
+
   keycloak:
     build:
       context: .
@@ -34,6 +37,7 @@ services:
       - db
     networks:
       - app-network
+
   db:
     image: postgres:latest
     container_name: postgres-db
@@ -47,15 +51,21 @@ services:
       - pgdata:/var/lib/postgresql/data
     networks:
       - app-network
+
   jenkins:
     image: jenkins/jenkins:2.430-jdk21
     environment:
       - JAVA_HOME=/usr/lib/jvm/java-21-openjdk
     ports:
-      - "8081:8080"
-      - "50000:50000"
+      - "8081:8080"   
+      - "50000:50000" 
     volumes:
-      - jenkins_home:/var/jenkins_home
+      - jenkins_home:/var/jenkins_home  
+      - /var/run/docker.sock:/var/run/docker.sock  
+    networks:
+      - jenkins_network
+    privileged: true   
+
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin
@@ -71,11 +81,14 @@ services:
     networks:
       - app-network
 
-networks:
-  app-network:
-
 volumes:
-  pgdata:
-  pgadmin-data:
-  keycloak_data:
-  jenkins_home:
+  jenkins_home:    
+  pgdata:          
+  pgadmin-data:    
+  keycloak_data:   
+
+networks:
+  app-network:     
+    driver: bridge
+  jenkins_network: 
+    driver: bridge
