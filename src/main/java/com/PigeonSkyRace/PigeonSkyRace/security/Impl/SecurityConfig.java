@@ -89,10 +89,10 @@ public class SecurityConfig {
         return authenticationConverter;
     }
 
-     @Bean
-    public JwtDecoder jwtDecoder() {
-        String keycloakUrl = "https://localhost:8444/realms/spring-boot-realm/protocol/openid-connect/certs";
-        return NimbusJwtDecoder.withJwkSetUri(keycloakUrl).build();
-    }
+    //  @Bean
+    // public JwtDecoder jwtDecoder() {
+    //     String keycloakUrl = "https://localhost:8444/realms/spring-boot-realm/protocol/openid-connect/certs";
+    //     return NimbusJwtDecoder.withJwkSetUri(keycloakUrl).build();
+    // }
 
 }
